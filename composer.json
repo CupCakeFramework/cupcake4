@@ -1,5 +1,5 @@
 {
-    "name": "CupCakeFramework/cupcake4",
+    "name": "cupcakeframework/cupcake4",
     "description": "CupCake 4 Framework",
     "require": {
         "phpmailer/phpmailer": "dev-master",
