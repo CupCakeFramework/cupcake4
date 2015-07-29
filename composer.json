@@ -2,7 +2,8 @@
     "name": "cupcakeframework/cupcake4",
     "description": "CupCake 4 Framework",
     "require": {
-        "phpmailer/phpmailer": "dev-master",
+        "php": ">=5.3",
+        "phpmailer/phpmailer": "5.2.10",
         "symfony/routing": "^2.7",
         "symfony/http-foundation": "^2.7"
     },
