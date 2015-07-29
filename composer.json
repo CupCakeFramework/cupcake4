@@ -1,0 +1,16 @@
+{
+    "name": "CupCakeFramework/cupcake4",
+    "description": "CupCake 4 Framework",
+    "require": {
+        "phpmailer/phpmailer": "dev-master",
+        "adamwathan/form": "0.5.*",
+        "badcow/lorem-ipsum": "dev-master",
+        "symfony/routing": "^2.7",
+        "symfony/http-foundation": "^2.7"
+    },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    }
+}
