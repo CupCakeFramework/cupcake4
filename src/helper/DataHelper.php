@@ -219,7 +219,7 @@ class DataHelper {
 
 
         /* paginacao------------------------------------------------------------------------------------------ */
-        $paginacao = '';
+        $paginacao = array();
 
         if ($qtd_registros != 0) {
             $sql_qtd = 'SELECT * FROM `' . $tabela . '` tbl ' . $where_custom;
@@ -237,12 +237,12 @@ class DataHelper {
             $total = $qry_qtd->rowCount();
 
             if ($total > $qtd_registros) {
-                $paginacao = $this->renderizarParcial('parc_paginacao', array(
+                $paginacao = array(
                     'qtd_registros' => $qtd_registros,
                     'pagina' => $pagina,
                     'total' => $total,
                     'url' => $url,
-                        ), true);
+                );
             }
         }
         return array(
