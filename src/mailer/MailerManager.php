@@ -6,7 +6,7 @@ class MailerManager {
     private $to;
     private $subject;
     private $message;
-    private $debug;
+    private $dumpEmailOnScreen;
 
     /**
      * @var CupRenderer
@@ -14,10 +14,10 @@ class MailerManager {
     private $renderer;
     private $config;
 
-    public function __construct(array $config, CupRenderer $renderer, $debug = false) {
+    public function __construct(array $config, CupRenderer $renderer, $dumpMailOnScreen = false) {
         $this->renderer = $renderer;
         $this->config = $config;
-        $this->debug = $debug;
+        $this->dumpEmailOnScreen = $dumpMailOnScreen;
     }
 
     public function enviaEmail($dados, $to, $subject = 'Contato através do site', $viewEmail = 'email/contato') {
@@ -42,7 +42,7 @@ class MailerManager {
         $mail->Subject = $this->subject;
         $mail->Body = $this->message;
 
-        if (true == $this->debug) {
+        if (true == $this->dumpEmailOnScreen) {
             header('Content-Type: text / html;charset = utf-8');
             die($mail->Body);
         }
@@ -50,7 +50,7 @@ class MailerManager {
     }
 
     public function getMailer() {
-        $mail = new PHPMailer;
+        $mail = new PHPMailer(true);
         if ($this->config['isSMTP']) {
             $mail->SMTPDebug = $this->config['SMTPDebug'];                               // Enable verbose debug output
             $mail->isSMTP();                                      // Set mailer to use SMTP
