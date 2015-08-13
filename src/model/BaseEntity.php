@@ -11,8 +11,8 @@ class BaseEntity {
 
     public function setValues(array $dados) {
         foreach ($dados as $campo => $valor) {
-            if (method_exists($this, 'set' . ucfirst($campo))) {
-                $method = 'set' . ucfirst($campo);
+            $method = 'set' . ucfirst($campo);
+            if (method_exists($this, $method)) {
                 $this->$method($valor);
             }
         }

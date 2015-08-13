@@ -35,10 +35,11 @@ class UserHelper {
         $this->em = $em;
         $this->userEntityName = $userEntityName;
         $this->setStatus(self::STATUS_SENHA_INVALIDA);
+        $this->startSession();
     }
 
     public function usuarioEstaLogado() {
-        return !empty($_SESSION[self::sessionUserAlias]['id']);
+        return false == empty($_SESSION[self::sessionUserAlias]['id']);
     }
 
     function getStatus() {
@@ -63,15 +64,15 @@ class UserHelper {
     public function logar($searchedValue, $password) {
         $userEntityName = $this->getUserEntityName();
         $usuario = $this->em->getRepository($userEntityName)->findOneBy(array($userEntityName::getFindFieldName() => $searchedValue));
-        if (!$usuario instanceof UserInterface) {
+        if (false == $usuario instanceof UserInterface) {
             $this->setStatus(self::STATUS_SENHA_INVALIDA);
             return false;
         }
-        if ($usuario->isLoggable()) {
+        if (false == $usuario->isLoggable()) {
             $this->setStatus(self::STATUS_USUARIO_INATIVO);
             return false;
         }
-        if (self::password_verify($password, $usuario->getSenha())) {
+        if (true === self::password_verify($password, $usuario->getSenha())) {
             $this->salvarUsuarioNaSessao($usuario);
             $this->setStatus(self::STATUS_LOGADO);
             return true;
@@ -117,6 +118,12 @@ class UserHelper {
 
     function getUserEntityName() {
         return $this->userEntityName;
+    }
+
+    function startSession() {
+        if (session_id() == '') {
+            session_start();
+        }
     }
 
 }

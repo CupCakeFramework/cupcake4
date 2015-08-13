@@ -11,6 +11,7 @@ class CupMessenger {
 
     function __construct($sessionId = 'messenger-default') {
         $this->sessionId = $sessionId;
+        $this->startSession();
     }
 
     public function adicionarMensagemErro($mensagem) {
@@ -63,6 +64,12 @@ class CupMessenger {
 
     public function removerMensagens() {
         unset($_SESSION[$this->sessionId]);
+    }
+
+    public function startSession() {
+        if (session_id() == '') {
+            session_start();
+        }
     }
 
 }
