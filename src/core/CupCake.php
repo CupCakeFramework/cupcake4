@@ -36,9 +36,6 @@ class CupCake {
             $routes->add($rota, new Route($values['route'], array('controller' => $values['controller'], 'action' => $values['action'])));
         }
 
-        $routes->add('Generator', new Route('/generateSiteControllerFromViews', array('controller' => 'GeneratorController', 'action' => 'generateSiteControllerFromViews')));
-        $routes->add('Generator', new Route('/generateRoutesFromViews', array('controller' => 'GeneratorController', 'action' => 'generateRoutesFromViews')));
-
         $context = $this->serviceManager->getService('RequestManager')->getContext();
 
         $matcher = new UrlMatcher($routes, $context);
@@ -52,6 +49,9 @@ class CupCake {
                 throw new Exception(sprintf('O Controller %s não possui o método %s', get_class($controller), $action));
             }
             $actionParameters = $this->getActionParameters($parameters);
+            if (true == method_exists($controller, 'beforeDispatch')) {
+                call_user_func(array($controller, 'beforeDispatch'));
+            }
             return call_user_func_array(array($controller, $action), $actionParameters);
         } catch (ResourceNotFoundException $ex) {
             return $errorController->actionError404();
