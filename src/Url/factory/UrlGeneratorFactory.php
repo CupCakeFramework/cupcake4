@@ -6,7 +6,7 @@
 class UrlGeneratorFactory {
 
     function __invoke(ServiceManager $serviceManager) {
-        return new UrlGenerator($serviceManager->getService('RequestManager'));
+        return new UrlGenerator($serviceManager->get('RequestManager'));
     }
 
 }

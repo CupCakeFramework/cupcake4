@@ -14,7 +14,7 @@ class EntityManagerFactory {
      */
     public function __invoke(ServiceManager $serviceManager) {
         /* @var $configManager ConfigManager */
-        $configManager = $serviceManager->getService('ConfigManager');
+        $configManager = $serviceManager->get('ConfigManager');
         $databaseConfig = $configManager->getConfig('database');
         $doctrineConfig = $configManager->getConfig('doctrine');
 

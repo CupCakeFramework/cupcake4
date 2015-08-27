@@ -32,18 +32,18 @@ class CupCake {
 
     function run() {
         $routes = new RouteCollection();
-        foreach ($this->serviceManager->getService('ConfigManager')->getConfig('routes') as $rota => $values) {
+        foreach ($this->serviceManager->get('ConfigManager')->getConfig('routes') as $rota => $values) {
             $routes->add($rota, new Route($values['route'], array('controller' => $values['controller'], 'action' => $values['action'])));
         }
 
-        $context = $this->serviceManager->getService('RequestManager')->getContext();
+        $context = $this->serviceManager->get('RequestManager')->getContext();
 
         $matcher = new UrlMatcher($routes, $context);
 
-        $errorController = $this->getServiceManager()->getService('ErrorController');
+        $errorController = $this->getServiceManager()->get('ErrorController');
         try {
             $parameters = $matcher->match($context->getPathInfo());
-            $controller = $this->getServiceManager()->getService($parameters['controller']);
+            $controller = $this->getServiceManager()->get($parameters['controller']);
             $action = $this->getNomeAction($parameters['action']);
             if (false == method_exists($controller, $action)) {
                 throw new Exception(sprintf('O Controller %s não possui o método %s', get_class($controller), $action));
@@ -101,7 +101,7 @@ class CupCake {
     public $db;
 
     public function setDbForPainel() {
-        $this->db = $this->getServiceManager()->getService('PDO');
+        $this->db = $this->getServiceManager()->get('PDO');
     }
 
 }

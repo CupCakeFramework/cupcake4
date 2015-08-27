@@ -13,9 +13,9 @@ class UserHelperFactory {
      */
     public function __invoke(ServiceManager $serviceManager) {
         /* @var $em EntityManager */
-        $em = $serviceManager->getService('EntityManager');
+        $em = $serviceManager->get('EntityManager');
         /* @var $config ConfigManager */
-        $config = $serviceManager->getService('ConfigManager');
+        $config = $serviceManager->get('ConfigManager');
         return new UserHelper($em,$config->getConfig('userEntityName'));
     }
 
