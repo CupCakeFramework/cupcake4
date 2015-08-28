@@ -10,14 +10,14 @@ use Exception;
 class ConfigManager
 {
 
-    private $configFiles = [];
-    private $config = [];
+    private $configFiles = array();
+    private $config = array();
 
     /**
      * @param array $configFiles
      * @throws Exception
      */
-    function __construct(array $configFiles)
+    public function __construct(array $configFiles)
     {
         $this->configFiles = $configFiles;
         foreach ($configFiles as $file) {
@@ -33,7 +33,7 @@ class ConfigManager
      * As configurações dadas merged
      * @return Array
      */
-    function __invoke()
+    public function __invoke()
     {
         return $this->config;
     }
@@ -42,7 +42,7 @@ class ConfigManager
      * @param string $node
      * @return mixed|ConfigManager
      */
-    function getConfig($node = '')
+    public function getConfig($node = '')
     {
         if (false == empty($node)) {
             if (is_array($this->config[$node])) {
