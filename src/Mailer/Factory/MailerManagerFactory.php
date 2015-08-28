@@ -1,30 +1,30 @@
 <?php
+namespace Cupcake\Mailer\Factory;
 
-namespace Cupcake\GenericFactory;
-
+use Cupcake\Mailer\MailerManager;
 use Cupcake\Managers\ConfigManager;
 use Cupcake\Service\ServiceManager;
-use PDO;
-
 
 /**
+ * Description of MailerManagerFactory
+ *
  * @author Ricardo Fiorani
  */
-class PDOFactory
+class MailerManagerFactory
 {
 
     /**
      * @param ServiceManager $serviceManager
-     * @return PDO
+     * @return MailerManager
      */
     public function __invoke(ServiceManager $serviceManager)
     {
         /* @var $configManager ConfigManager */
         $configManager = $serviceManager->get('ConfigManager');
-        $databaseConfig = $configManager->getConfig('database');
+        $renderer = $serviceManager->get('CupRenderer');
 
-        return new PDO("mysql:host=" . $databaseConfig['host'] . ";dbname=" . $databaseConfig['dbname'],
-            $databaseConfig['user'], $databaseConfig['password']);
+        return new MailerManager($configManager->getConfig('mailer'), $renderer,
+            $configManager->getConfig('dumpEmailOnScreen'));
     }
 
 }

@@ -1,14 +1,24 @@
 <?php
 
+namespace Cupcake\Managers;
+
+use Exception;
+
 /**
  * @author Ricardo Fiorani
  */
-class ConfigManager {
+class ConfigManager
+{
 
-    private $configFiles = array();
-    private $config = array();
+    private $configFiles = [];
+    private $config = [];
 
-    function __construct(array $configFiles) {
+    /**
+     * @param array $configFiles
+     * @throws Exception
+     */
+    function __construct(array $configFiles)
+    {
         $this->configFiles = $configFiles;
         foreach ($configFiles as $file) {
             if (false == file_exists($file)) {
@@ -23,14 +33,26 @@ class ConfigManager {
      * As configurações dadas merged
      * @return Array
      */
-    function __invoke() {
+    function __invoke()
+    {
         return $this->config;
     }
 
-    function getConfig($node = '') {
+    /**
+     * @param string $node
+     * @return mixed|ConfigManager
+     */
+    function getConfig($node = '')
+    {
         if (false == empty($node)) {
+            if (is_array($this->config[$node])) {
+                return new ConfigManager($this->config[$node]);
+            }
+
             return $this->config[$node];
         }
+
+
         return $this->config;
     }
 
