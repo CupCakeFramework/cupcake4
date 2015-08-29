@@ -2,7 +2,7 @@
 
 namespace Cupcake\Core;
 
-use Cupcake\Managers\ConfigManager;
+use Cupcake\Config\ConfigManager;
 use Cupcake\Service\ServiceManager;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RouteCollection;
@@ -29,10 +29,10 @@ class CupCake
     {
         $this->setServiceManager(new ServiceManager());
         $this->getServiceManager()->injectService('ConfigManager', $config);
-        foreach ($config->getConfig('services') as $service => $factory) {
+        foreach ($config->getValue('services') as $service => $factory) {
             $this->getServiceManager()->addFactory($service, $factory);
         }
-        foreach ($config->getConfig('controllers') as $controller => $factory) {
+        foreach ($config->getValue('controllers') as $controller => $factory) {
             $this->getServiceManager()->addFactory($controller, $factory);
         }
 
@@ -48,7 +48,8 @@ class CupCake
         $routes = new RouteCollection();
         foreach ($this->serviceManager->get('ConfigManager')->getConfig('routes') as $rota => $values) {
             $routes->add($rota,
-                new Route($values['route'], ['controller' => $values['controller'], 'action' => $values['action']]));
+                new Route($values['route'],
+                    array('controller' => $values['controller'], 'action' => $values['action'])));
         }
 
         /*@var $context RequestContext */
@@ -66,10 +67,10 @@ class CupCake
             }
             $actionParameters = $this->getActionParameters($parameters);
             if (true == method_exists($controller, 'beforeDispatch')) {
-                call_user_func([$controller, 'beforeDispatch']);
+                call_user_func(array($controller, 'beforeDispatch'));
             }
 
-            return call_user_func_array([$controller, $action], $actionParameters);
+            return call_user_func_array(array($controller, $action), $actionParameters);
         } catch (ResourceNotFoundException $ex) {
             return $errorController->actionError404();
         } catch (MethodNotAllowedException $ex) {

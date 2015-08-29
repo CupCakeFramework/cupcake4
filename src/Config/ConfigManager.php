@@ -1,6 +1,6 @@
 <?php
 
-namespace Cupcake\Managers;
+namespace Cupcake\Config;
 
 use Exception;
 
@@ -40,20 +40,47 @@ class ConfigManager
 
     /**
      * @param string $node
-     * @return mixed|ConfigManager
+     * @return ConfigManager
+     * @throws Exception
      */
-    public function getConfig($node = '')
+    public function getNode($node)
     {
-        if (false == empty($node)) {
-            if (is_array($this->config[$node])) {
-                return new ConfigManager($this->config[$node]);
-            }
-
-            return $this->config[$node];
+        if (false == $this->nodeExists($node)) {
+            throw new Exception(sprintf("The node %s does not exists.", $node));
         }
 
+        if (false == $this->isNode($node)) {
+            throw new Exception(sprintf("%s is not a node.", $node));
+        }
 
-        return $this->config;
+        return new ConfigManager($this->config[$node]);
+    }
+
+    /**
+     * @param string $node
+     * @return bool
+     */
+    public function nodeExists($node)
+    {
+        return isset($this->config[$node]);
+    }
+
+    /**
+     * @param string $node
+     * @return bool
+     */
+    public function isNode($node)
+    {
+        return is_array($this->config[$node]);
+    }
+
+    /**
+     * @param $key
+     * @return array
+     */
+    public function getValue($key)
+    {
+        return $this->config[$key];
     }
 
 }
