@@ -1,31 +1,45 @@
 <?php
 
+
+namespace Cupcake\ObjectMapper;
+
+use Cupcake\Request\RequestManager;
+use Exception;
+use PDO;
+use stdClass;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * @author Ricardo Fiorani
  */
-class DataHelper {
+class ObjectMapper
+{
 
     const TABLE_SUFIX = 'tbl_';
 
     /**
-     * @var PDO 
+     * @var PDO
      */
     private $db;
     private $baseUrl;
     private $debug;
 
-    function __construct(PDO $db, RequestManager $cpr, $debug = false) {
+    function __construct(PDO $db, RequestManager $cpr, $debug = false)
+    {
         $this->db = $db;
         $this->baseUrl = $cpr->getBaseUrl();
         $this->debug = $debug;
     }
 
     /**
-     * FUNÇÃO QUE RETORNA O verRegistroPadrao em forma de objeto
+     * @param $tabela
+     * @param int $id
+     * @param bool|false $checar
+     * @return stdClass
+     * @throws Exception
      */
-    public function ver($tabela, $id = 0, $checar = false) {
+    public function ver($tabela, $id = 0, $checar = false)
+    {
         $d = $this->array_to_object($this->verRegistroPadrao(self::TABLE_SUFIX . $tabela, $id));
         if (($checar && false == $d instanceof stdClass) || ($checar && $id != $d->id)) {
             throw new ResourceNotFoundException;
@@ -35,13 +49,35 @@ class DataHelper {
     }
 
     /**
-     * FUNÇÃO QUE RETORNA O retornoRegistroPadrao em forma de objeto
+     * @param $tabela
+     * @param string $url
+     * @param int $pagina
+     * @param int $qtd_registros
+     * @param string $where_custom
+     * @param string $campo_ordem
+     * @param string $campo_group
+     * @return stdClass
+     * @throws Exception
      */
-    public function listar($tabela, $url = '', $pagina = 1, $qtd_registros = 0, $where_custom = 'where ativo = "Sim"', $campo_ordem = 'ordem', $campo_group = '') {
-        return $this->array_to_object($this->retornoRegistroPadrao(self::TABLE_SUFIX . $tabela, $url, $pagina, $qtd_registros, $where_custom, $campo_ordem, $campo_group));
+    public function listar(
+        $tabela,
+        $url = '',
+        $pagina = 1,
+        $qtd_registros = 0,
+        $where_custom = 'where ativo = "Sim"',
+        $campo_ordem = 'ordem',
+        $campo_group = ''
+    ) {
+        return $this->array_to_object($this->retornoRegistroPadrao(self::TABLE_SUFIX . $tabela, $url, $pagina,
+            $qtd_registros, $where_custom, $campo_ordem, $campo_group));
     }
 
-    public function redirect($url, $interno = true) {
+    /**
+     * @param $url
+     * @param bool|true $interno
+     */
+    public function redirect($url, $interno = true)
+    {
         //Caso parametro URL esteja em branco será redirecionado para a raíz (Home)
         if ($interno) {
             header('Location: ' . $this->baseUrl . $url);
@@ -51,8 +87,15 @@ class DataHelper {
         exit;
     }
 
-    public function gerarGaleria($data, $caminho = '', $retorno_unico = false) {
-        $img_cat = array();
+    /**
+     * @param $data
+     * @param string $caminho
+     * @param bool|false $retorno_unico
+     * @return stdClass
+     */
+    public function gerarGaleria($data, $caminho = '', $retorno_unico = false)
+    {
+        $img_cat = [];
         if (isset($data)) {
             $imagens = explode(';', trim($data));
             foreach ($imagens as $key => $value) {
@@ -92,30 +135,57 @@ class DataHelper {
         }
     }
 
-    public function array_to_object($array) {
+    /**
+     * Converts an array to an stdClass Object
+     * @param $array
+     * @return stdClass
+     */
+    public function array_to_object($array)
+    {
         if (!empty($array)) {
             $obj = new stdClass;
-            foreach ((array) $array as $k => $v) {
+            foreach ((array)$array as $k => $v) {
                 if (is_array($v)) {
                     $obj->{$k} = $this->array_to_object($v); //RECURSION
                 } else {
                     $obj->{$k} = $v;
                 }
             }
+
             return $obj;
         } else {
             return $array;
         }
     }
 
-    public function retornoRegistroPadrao($tabela, $url = '', $pagina = 1, $qtd_registros = 0, $where_custom = 'where ativo = "Sim"', $campo_ordem = 'ordem', $campo_group = '') {
+    /**
+     * @param $tabela
+     * @param string $url
+     * @param int $pagina
+     * @param int $qtd_registros
+     * @param string $where_custom
+     * @param string $campo_ordem
+     * @param string $campo_group
+     * @return array
+     * @throws Exception
+     */
+    public function retornoRegistroPadrao(
+        $tabela,
+        $url = '',
+        $pagina = 1,
+        $qtd_registros = 0,
+        $where_custom = 'where ativo = "Sim"',
+        $campo_ordem = 'ordem',
+        $campo_group = ''
+    ) {
         //Adaptação do Where_Custom para array
         if (is_array($where_custom)) {
             foreach ($where_custom as $key => $value) {
-                if (!empty($whereTemp))
+                if (!empty($whereTemp)) {
                     $whereTemp .= ' and ';
-                else
+                } else {
                     $whereTemp = ' where ';
+                }
                 $whereTemp .= $key . ' = "' . $value . '" ';
             }
             $where_custom = $whereTemp;
@@ -130,9 +200,9 @@ class DataHelper {
         }
 
         if (trim(strtolower($campo_ordem)) == 'rand()') {
-            $sql .=' order by ' . $campo_ordem . ' ';
+            $sql .= ' order by ' . $campo_ordem . ' ';
         } else {
-            $sql .=' order by tbl.' . $campo_ordem . ' ';
+            $sql .= ' order by tbl.' . $campo_ordem . ' ';
         }
 
 
@@ -152,7 +222,7 @@ class DataHelper {
             throw new Exception($erro_sql[2], $erro_sql[1]);
         }
 
-        $retorno = array();
+        $retorno = [];
         if (false !== $qry) {
             if ($qry->rowCount() > 0) {
                 while ($row = $qry->fetch(PDO::FETCH_ASSOC)) {
@@ -219,7 +289,7 @@ class DataHelper {
 
 
         /* paginacao------------------------------------------------------------------------------------------ */
-        $paginacao = array();
+        $paginacao = [];
 
         if ($qtd_registros != 0) {
             $sql_qtd = 'SELECT * FROM `' . $tabela . '` tbl ' . $where_custom;
@@ -228,9 +298,9 @@ class DataHelper {
             }
 
             if (trim(strtolower($campo_ordem)) == 'rand()') {
-                $sql_qtd .=' order by ' . $campo_ordem . ' ';
+                $sql_qtd .= ' order by ' . $campo_ordem . ' ';
             } else {
-                $sql_qtd .=' order by tbl.' . $campo_ordem . ' ';
+                $sql_qtd .= ' order by tbl.' . $campo_ordem . ' ';
             }
 
             $qry_qtd = $this->db->query($sql_qtd);
@@ -245,9 +315,10 @@ class DataHelper {
                 );
             }
         }
+
         return array(
             'registros' => $retorno,
-            'qtd_registros' => count((array) $retorno),
+            'qtd_registros' => count((array)$retorno),
             'paginacao' => $paginacao,
             'pagina' => $pagina,
             'pasta_imagem' => $tabelaSemSufixo,
@@ -257,7 +328,14 @@ class DataHelper {
         );
     }
 
-    public function verRegistroPadrao($tabela, $id = 0) {
+    /**
+     * @param $tabela
+     * @param int $id
+     * @return mixed
+     * @throws Exception
+     */
+    public function verRegistroPadrao($tabela, $id = 0)
+    {
         $pastasArray = explode('tbl_', $tabela);
         $tabelaSemSufixo = end($pastasArray);
         if (empty($id) || $id == 0) {
@@ -341,29 +419,53 @@ class DataHelper {
         return $row;
     }
 
-    public function geraUrl($input_str) {
+    /**
+     * @param $input_str
+     * @return mixed|string
+     */
+    public function geraUrl($input_str)
+    {
         $input_str = $this->removeAcentos($input_str);
         $input_str = strtolower($input_str);
         $input_str = preg_replace("/[^a-z0-9_\s-]/", "", $input_str);
         $input_str = preg_replace("/[\s-]+/", " ", $input_str);
         $input_str = preg_replace("/[\s_]/", "-", $input_str);
+
         return $input_str;
     }
 
-    public function stringUrlAmigavel($phrase, $maxLength = 50) {
+
+    /**
+     * @param $phrase
+     * @param int $maxLength
+     * @return mixed|string
+     */
+    public function stringUrlAmigavel($phrase, $maxLength = 50)
+    {
         $result = strtolower($phrase);
         $result = preg_replace("/[^a-z0-9\s-]/", "", $result);
         $result = trim(preg_replace("/[\s-]+/", " ", $result));
         $result = trim(substr($result, 0, $maxLength));
         $result = preg_replace("/\s/", "-", $result);
+
         return $result;
     }
 
-    public function removeAcentos($var) {
+    /**
+     * @param $var
+     * @return string
+     */
+    public function removeAcentos($var)
+    {
         return $this->normaliza($var);
     }
 
-    public function normaliza($string) {
+    /**
+     * @param $string
+     * @return string
+     */
+    public function normaliza($string)
+    {
         $a = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞ
 ßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ';
         $b = 'aaaaaaaceeeeiiiidnoooooouuuuy
@@ -371,34 +473,49 @@ bsaaaaaaaceeeeiiiidnoooooouuuyybyRr';
         $string = utf8_decode($string);
         $string = strtr($string, utf8_decode($a), $b);
         $string = strtolower($string);
+
         return utf8_encode($string);
     }
 
-    public function resumirStr($texto, $n = 20) {
+    /**
+     * @param $texto
+     * @param int $n
+     * @return string
+     */
+    public function resumirStr($texto, $n = 20)
+    {
         $texto = strip_tags($texto);
         $texto = trim(preg_replace("/\s+/", " ", $texto));
         $word_array = explode(" ", $texto);
-        if (count($word_array) <= $n)
+        if (count($word_array) <= $n) {
             return implode(" ", $word_array);
-        else {
+        } else {
             $texto = '';
             foreach ($word_array as $length => $word) {
-                $texto.=$word;
-                if ($length == $n)
+                $texto .= $word;
+                if ($length == $n) {
                     break;
-                else
-                    $texto.=" ";
+                } else {
+                    $texto .= " ";
+                }
             }
         }
+
         return $texto;
     }
 
-    public function getTextoGeral($cod) {
+    /**
+     * @param $cod
+     * @return mixed
+     */
+    public function getTextoGeral($cod)
+    {
         $obj = $this->listar('sys_textos_gerais', '', 1, 1, ' where cod="' . $cod . '"');
         $texto = $obj->registros;
         if (empty($texto)) {
             $sql = "INSERT INTO `tbl_sys_textos_gerais` (`id`, `cod`, `nome`, `descricao`, `ordem`, `ativo`) VALUES (NULL, '$cod', '$cod', 'TEXTO GERENCIAVEL PELO PAINEL (COD:$cod)', '0', 'Sim');";
             $this->db->query($sql);
+
             return $this->getTextoGeral($cod);
         } else {
             return reset($texto)->descricao;

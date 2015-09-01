@@ -1,28 +1,38 @@
 <?php
 
+namespace Cupcake\Core;
+
+use Cupcake\Config\ConfigManager;
+use Cupcake\Service\ServiceManager;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Exception;
 
 /**
  * @author Ricardo Fiorani
  */
-class CupCake {
+class CupCake
+{
 
     /**
-     * @var ServiceManager 
+     * @var ServiceManager
      */
     private $serviceManager;
 
-    function __construct(ConfigManager $config) {
+    /**
+     * @param ConfigManager $config
+     */
+    function __construct(ConfigManager $config)
+    {
         $this->setServiceManager(new ServiceManager());
         $this->getServiceManager()->injectService('ConfigManager', $config);
-        foreach ($config->getConfig('services') as $service => $factory) {
+        foreach ($config->getValue('services') as $service => $factory) {
             $this->getServiceManager()->addFactory($service, $factory);
         }
-        foreach ($config->getConfig('controllers') as $controller => $factory) {
+        foreach ($config->getValue('controllers') as $controller => $factory) {
             $this->getServiceManager()->addFactory($controller, $factory);
         }
 
@@ -30,12 +40,19 @@ class CupCake {
         $this->setDbForPainel();
     }
 
-    function run() {
+    /**
+     * @return mixed
+     */
+    function run()
+    {
         $routes = new RouteCollection();
         foreach ($this->serviceManager->get('ConfigManager')->getConfig('routes') as $rota => $values) {
-            $routes->add($rota, new Route($values['route'], array('controller' => $values['controller'], 'action' => $values['action'])));
+            $routes->add($rota,
+                new Route($values['route'],
+                    array('controller' => $values['controller'], 'action' => $values['action'])));
         }
 
+        /*@var $context RequestContext */
         $context = $this->serviceManager->get('RequestManager')->getContext();
 
         $matcher = new UrlMatcher($routes, $context);
@@ -52,6 +69,7 @@ class CupCake {
             if (true == method_exists($controller, 'beforeDispatch')) {
                 call_user_func(array($controller, 'beforeDispatch'));
             }
+
             return call_user_func_array(array($controller, $action), $actionParameters);
         } catch (ResourceNotFoundException $ex) {
             return $errorController->actionError404();
@@ -62,7 +80,12 @@ class CupCake {
         }
     }
 
-    public function getActionParameters(array $parameters) {
+    /**
+     * @param array $parameters
+     * @return array
+     */
+    public function getActionParameters(array $parameters)
+    {
         $removableParameters = array(
             'controller',
             'action',
@@ -73,26 +96,38 @@ class CupCake {
                 unset($parameters[$key]);
             }
         }
+
         return $parameters;
     }
 
-    public function getNomeAction($view) {
+    /**
+     * @param $view
+     * @return string
+     */
+    public function getNomeAction($view)
+    {
         $listaNomes = explode('-', $view);
         $action = '';
         foreach ($listaNomes as $nome) {
             $action .= ucfirst($nome);
         }
+
         return 'action' . $action;
     }
 
     /**
      * @return ServiceManager
      */
-    function getServiceManager() {
+    function getServiceManager()
+    {
         return $this->serviceManager;
     }
 
-    function setServiceManager(ServiceManager $serviceManager) {
+    /**
+     * @param ServiceManager $serviceManager
+     */
+    function setServiceManager(ServiceManager $serviceManager)
+    {
         $this->serviceManager = $serviceManager;
     }
 
@@ -100,7 +135,8 @@ class CupCake {
 
     public $db;
 
-    public function setDbForPainel() {
+    public function setDbForPainel()
+    {
         $this->db = $this->getServiceManager()->get('PDO');
     }
 

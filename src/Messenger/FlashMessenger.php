@@ -1,43 +1,63 @@
 <?php
 
+namespace Cupcake\Messenger;
+
 /**
  * Messenger Simples para ser usado com o CupCake 3
  *
  * @author Ricardo Fiorani
  */
-class CupMessenger {
+class FlashMessenger
+{
+
+    const TYPE_NEUTRAL = 0;
+    const TYPE_SUCCESS = 1;
+    const TYPE_ERROR = 2;
+
 
     private $sessionId;
 
-    function __construct($sessionId = 'messenger-default') {
+    /**
+     * @param string $sessionId
+     */
+    function __construct($sessionId = 'messenger-default')
+    {
         $this->sessionId = $sessionId;
         $this->startSession();
     }
 
-    public function adicionarMensagemErro($mensagem) {
+
+    /**
+     * @param $mensagem
+     */
+    public function adicionarMensagemErro($mensagem)
+    {
         $this->adicionarMensagem($mensagem, 2);
     }
 
-    public function adicionarMensagemSucesso($mensagem) {
+    /**
+     * @param $mensagem
+     */
+    public function adicionarMensagemSucesso($mensagem)
+    {
         $this->adicionarMensagem($mensagem, 1);
     }
 
-    public function adicionarMensagem($mensagem, $tipo = 0) {
-        /*
-         * Tipos
-         * 0 = Neutro
-         * 1 = Sucesso
-         * 2 = Erro
-         */
+    /**
+     * @param $mensagem
+     * @param int $tipo
+     */
+    public function adicionarMensagem($mensagem, $tipo = self::TYPE_NEUTRAL)
+    {
         switch ($tipo) {
-            case 0:
+            case self::TYPE_NEUTRAL :
             default:
                 $classeErro = 'info';
                 break;
-            case 1:
+            case self::TYPE_SUCCESS :
                 $classeErro = 'success';
                 break;
-            case 2:
+            case self::TYPE_ERROR :
                 $classeErro = 'danger';
                 break;
         }
@@ -48,25 +68,43 @@ class CupMessenger {
         array_push($_SESSION[$this->sessionId], array('mensagem' => $mensagem, 'classe' => $classeErro));
     }
 
-    public function listarMensagens() {
+    /**
+     * @return array
+     */
+    public function listarMensagens()
+    {
         $mensagens = $_SESSION[$this->sessionId];
         $this->removerMensagens();
+
         return $mensagens;
     }
 
-    public function existeMensagens() {
+    /**
+     * @return bool
+     */
+    public function existeMensagens()
+    {
         return !empty($_SESSION[$this->sessionId]);
     }
 
-    public function contarMensagens() {
+    /**
+     * @return int
+     */
+    public function contarMensagens()
+    {
         return count($_SESSION[$this->sessionId]);
     }
 
-    public function removerMensagens() {
+    /**
+     * Remove all messages from the session
+     */
+    public function removerMensagens()
+    {
         unset($_SESSION[$this->sessionId]);
     }
 
-    public function startSession() {
+    public function startSession()
+    {
         if (session_id() == '') {
             session_start();
         }

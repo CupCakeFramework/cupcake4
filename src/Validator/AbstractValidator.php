@@ -1,42 +1,55 @@
 <?php
+namespace Cupcake\Validator;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+use Cupcake\Messenger\FlashMessenger;
 
 /**
- * Description of BaseValidator
- *
- * @author Ricardo Desktop
+ * @author Ricardo Fiorani
  */
-class BaseValidator {
+class AbstractValidator
+{
 
     /**
      * Messenger utilizado
-     * @var CupMessenger 
+     * @var FlashMessenger
      */
     private $messenger;
 
-    public function __construct(CupMessenger $messenger) {
+    /**
+     * @param FlashMessenger $messenger
+     */
+    public function __construct(FlashMessenger $messenger)
+    {
         $this->setMessenger($messenger);
     }
 
-    function getMessenger() {
+    /**
+     * @return FlashMessenger
+     */
+    function getMessenger()
+    {
         return $this->messenger;
     }
 
-    function setMessenger(CupMessenger $messenger) {
+    /**
+     * @param FlashMessenger $messenger
+     */
+    function setMessenger(FlashMessenger $messenger)
+    {
         $this->messenger = $messenger;
     }
 
-    public function validar_cnpj($cnpj) {
+    /**
+     * @param $cnpj
+     * @return bool
+     */
+    public function validar_cnpj($cnpj)
+    {
         // Deixa o CNPJ com apenas números
         $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
 
         // Garante que o CNPJ é uma string
-        $cnpj = (string) $cnpj;
+        $cnpj = (string)$cnpj;
 
         // O valor original
         $cnpj_original = $cnpj;
@@ -49,7 +62,7 @@ class BaseValidator {
 
         // Se o resto da divisão entre o primeiro cálculo e 11 for menor que 2, o primeiro
         // Dígito é zero (0), caso contrário é 11 - o resto da divisão entre o cálculo e 11
-        $primeiro_digito = ( $primeiro_calculo % 11 ) < 2 ? 0 : 11 - ( $primeiro_calculo % 11 );
+        $primeiro_digito = ($primeiro_calculo % 11) < 2 ? 0 : 11 - ($primeiro_calculo % 11);
 
         // Concatena o primeiro dígito nos 12 primeiros números do CNPJ
         // Agora temos 13 números aqui
@@ -57,7 +70,7 @@ class BaseValidator {
 
         // O segundo cálculo é a mesma coisa do primeiro, porém, começa na posição 6
         $segundo_calculo = $this->multiplica_cnpj($primeiros_numeros_cnpj, 6);
-        $segundo_digito = ( $segundo_calculo % 11 ) < 2 ? 0 : 11 - ( $segundo_calculo % 11 );
+        $segundo_digito = ($segundo_calculo % 11) < 2 ? 0 : 11 - ($segundo_calculo % 11);
 
         // Concatena o segundo dígito ao CNPJ
         $cnpj = $primeiros_numeros_cnpj . $segundo_digito;
@@ -76,14 +89,15 @@ class BaseValidator {
      * @return int O
      *
      */
-    public function multiplica_cnpj($cnpj, $posicao = 5) {
+    public function multiplica_cnpj($cnpj, $posicao = 5)
+    {
         // Variável para o cálculo
         $calculo = 0;
 
         // Laço para percorrer os item do cnpj
         for ($i = 0; $i < strlen($cnpj); $i++) {
             // Cálculo mais posição do CNPJ * a posição
-            $calculo = $calculo + ( $cnpj[$i] * $posicao );
+            $calculo = $calculo + ($cnpj[$i] * $posicao);
 
             // Decrementa a posição a cada volta do laço
             $posicao--;
@@ -93,11 +107,17 @@ class BaseValidator {
                 $posicao = 9;
             }
         }
+
         // Retorna o cálculo
         return $calculo;
     }
 
-    public function validaCPF($cpf = null) {
+    /**
+     * @param null $cpf
+     * @return bool
+     */
+    public function validaCPF($cpf = null)
+    {
         // Verifica se um número foi informado
         if (empty($cpf)) {
             return false;
@@ -111,7 +131,8 @@ class BaseValidator {
         }
         // Verifica se nenhuma das sequências invalidas abaixo 
         // foi digitada. Caso afirmativo, retorna falso
-        else if ($cpf == '00000000000' ||
+        else {
+            if ($cpf == '00000000000' ||
                 $cpf == '11111111111' ||
                 $cpf == '22222222222' ||
                 $cpf == '33333333333' ||
@@ -120,29 +141,42 @@ class BaseValidator {
                 $cpf == '66666666666' ||
                 $cpf == '77777777777' ||
                 $cpf == '88888888888' ||
-                $cpf == '99999999999') {
-            return false;
-            // Calcula os digitos verificadores para verificar se o
-            // CPF é válido
-        } else {
-            for ($t = 9; $t < 11; $t++) {
-                for ($d = 0, $c = 0; $c < $t; $c++) {
-                    $d += $cpf{$c} * (($t + 1) - $c);
+                $cpf == '99999999999'
+            ) {
+                return false;
+                // Calcula os digitos verificadores para verificar se o
+                // CPF é válido
+            } else {
+                for ($t = 9; $t < 11; $t++) {
+                    for ($d = 0, $c = 0; $c < $t; $c++) {
+                        $d += $cpf{$c} * (($t + 1) - $c);
+                    }
+                    $d = ((10 * $d) % 11) % 10;
+                    if ($cpf{$c} != $d) {
+                        return false;
+                    }
                 }
-                $d = ((10 * $d) % 11) % 10;
-                if ($cpf{$c} != $d) {
-                    return false;
-                }
+
+                return true;
             }
-            return true;
         }
     }
 
-    public function validarEmail($email) {
+    /**
+     * @param $email
+     * @return bool
+     */
+    public function validarEmail($email)
+    {
         return !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL);
     }
 
-    public function validarCep($cep) {
+    /**
+     * @param $cep
+     * @return bool
+     */
+    public function validarCep($cep)
+    {
         // retira espacos em branco
         $cep = trim($cep);
         // expressao regular para avaliar o cep

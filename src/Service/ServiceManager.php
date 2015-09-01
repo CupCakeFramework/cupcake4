@@ -1,25 +1,49 @@
 <?php
 
+namespace Cupcake\Service;
+
+use Cupcake\Service\Exception\ContainerException;
+use Cupcake\Service\Exception\NotFoundException;
 use Interop\Container\ContainerInterface;
 
 /**
- * @author Ricardo Fiorani
+ * @author Fábio Carneiro
  */
-class ServiceManager implements ContainerInterface {
+class ServiceManager implements ContainerInterface
+{
 
-    private $factories = Array();
-    private $services = Array();
+    private $factories = array();
+    private $services = array();
 
-    public function addFactory($service, $factory) {
-        if (false == is_string($service)) {
-            throw new ContainerException(sprintf('Service name %s must be a string', $service));
+    /**
+     * @param string $serviceId The Service ID
+     * @param Callable $factory The Service Factory (Must be a Callable)
+     * @throws ContainerException
+     */
+    public function addFactory($serviceId, $factory)
+    {
+        if (false == is_string($serviceId)) {
+            throw new ContainerException(sprintf('Service name %s must be a string', $serviceId));
         }
+
+        if (is_callable($factory)) {
+            $this->factories[$serviceId] = $factory;
+
+            return;
+        }
+
+        if (false == class_exists($factory)) {
+            throw new ContainerException(sprintf('Factory %s must be a class or callable', $serviceId));
+        }
+
         $instantiatedFactory = new $factory;
+
         if (false == is_callable($instantiatedFactory)) {
             throw new ContainerException(sprintf('Factory %s must be a callable', $factory));
         }
 
-        $this->factories[$service] = new $instantiatedFactory;
+        $this->factories[$serviceId] = new $instantiatedFactory;
+
     }
 
     /**
@@ -32,7 +56,8 @@ class ServiceManager implements ContainerInterface {
      *
      * @return mixed Entry.
      */
-    public function get($id) {
+    public function get($id)
+    {
         if (false == is_string($id)) {
             throw new ContainerException('Service ID must be a string');
         }
@@ -57,11 +82,13 @@ class ServiceManager implements ContainerInterface {
      *
      * @return boolean
      */
-    public function has($id) {
+    public function has($id)
+    {
         return isset($this->factories[$id]);
     }
 
-    public function injectService($serviceName, $service) {
+    public function injectService($serviceName, $service)
+    {
         $this->services[$serviceName] = $service;
     }
 

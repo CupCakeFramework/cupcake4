@@ -1,6 +1,11 @@
 <?php
+namespace Cupcake\Mailer;
 
-class MailerManager {
+use Cupcake\Renderer\CupRendererInterface;
+use PHPMailer;
+
+class MailerManager
+{
 
     private $template = 'email_template';
     private $to;
@@ -9,30 +14,45 @@ class MailerManager {
     private $dumpEmailOnScreen;
 
     /**
-     * @var CupRenderer
+     * @var CupRendererInterface
      */
     private $renderer;
+
+    /**
+     * @var array
+     */
     private $config;
 
-    public function __construct(array $config, CupRenderer $renderer, $dumpMailOnScreen = false) {
+    /**
+     * @param array $config
+     * @param CupRendererInterface $renderer
+     * @param bool|false $dumpMailOnScreen
+     */
+    public function __construct(array $config, CupRendererInterface $renderer, $dumpMailOnScreen = false)
+    {
         $this->renderer = $renderer;
         $this->config = $config;
         $this->dumpEmailOnScreen = $dumpMailOnScreen;
     }
 
-    public function enviaEmail($dados, $to, $subject = 'Contato através do site', $viewEmail = 'email/contato') {
+    public function enviaEmail($dados, $to, $subject = 'Contato através do site', $viewEmail = 'email/contato')
+    {
         $this->to = $to;
         $this->subject = $subject;
-        $this->message = $this->getRenderedEmail($viewEmail, array('dados' => $dados, 'subject' => $this->subject));
+        $this->message = $this->getRenderedEmail($viewEmail, ['dados' => $dados, 'subject' => $this->subject]);
+
         return $this->send();
     }
 
-    private function getRenderedEmail($view, $dados) {
+    private function getRenderedEmail($view, $dados)
+    {
         $this->getRenderer()->setTemplate($this->template);
+
         return $this->getRenderer()->renderizar($view, $dados, true);
     }
 
-    private function send() {
+    private function send()
+    {
         $mail = $this->getMailer();
         $mail->addAddress($this->to);
         $mail->addReplyTo($this->to);
@@ -46,10 +66,15 @@ class MailerManager {
             header('Content-Type: text / html;charset = utf-8');
             die($mail->Body);
         }
+
         return $mail->send();
     }
 
-    public function getMailer() {
+    /**
+     * @return PHPMailer
+     */
+    public function getMailer()
+    {
         $mail = new PHPMailer(true);
         if ($this->config['isSMTP']) {
             $mail->SMTPDebug = $this->config['SMTPDebug'];                               // Enable verbose debug output
@@ -69,13 +94,15 @@ class MailerManager {
             $mail->FromName = $this->config['FromName'];
             $mail->isMail();
         }
+
         return $mail;
     }
 
     /**
-     * @return CupRenderer
+     * @return CupRendererInterface
      */
-    private function getRenderer() {
+    private function getRenderer()
+    {
         return $this->renderer;
     }
 
