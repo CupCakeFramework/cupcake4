@@ -1,9 +1,9 @@
 <?php
 namespace Cupcake\Messenger\Factory;
 
+use Cupcake\Config\ConfigManager;
 use Cupcake\Messenger\FlashMessenger;
 use Cupcake\Service\ServiceManager;
-use Cupcake\Managers\ConfigManager;
 
 /**
  * @author Ricardo Fiorani
@@ -19,7 +19,7 @@ class FlashMessengerFactory
     {
         /** @var ConfigManager $config */
         $config = $serviceManager->get('ConfigManager');
-        $sessionId = $config->getConfig('FlashMessenger')->getConfig('session-id');
+        $sessionId = $config->getNode('flash-messenger')->get('session-id');
 
         return new FlashMessenger($sessionId);
     }

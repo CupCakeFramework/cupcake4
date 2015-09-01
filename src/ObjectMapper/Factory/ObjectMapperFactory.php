@@ -2,6 +2,7 @@
 
 namespace Cupcake\ObjectMapper\Factory;
 
+use Cupcake\Config\ConfigManager;
 use Cupcake\ObjectMapper\ObjectMapper;
 use Cupcake\Service\ServiceManager;
 
@@ -19,7 +20,9 @@ class ObjectMapperFactory
     {
         $db = $serviceManager->get('PDO');
         $cpr = $serviceManager->get('RequestManager');
-        $debug = $serviceManager->get('ConfigManager')->getConfig('debug');
+        /** @var ConfigManager $configManager */
+        $configManager = $serviceManager->get('ConfigManager');
+        $debug = $configManager->get('debug');
 
         return new ObjectMapper($db, $cpr, $debug);
     }

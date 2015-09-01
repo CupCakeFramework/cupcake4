@@ -23,8 +23,8 @@ class MailerManagerFactory
         $configManager = $serviceManager->get('ConfigManager');
         $renderer = $serviceManager->get('CupRenderer');
 
-        return new MailerManager($configManager->getConfig('mailer'), $renderer,
-            $configManager->getConfig('dumpEmailOnScreen'));
+        return new MailerManager($configManager->getValue('mailer'), $renderer,
+            $configManager->getValue('dumpEmailOnScreen'));
     }
 
 }

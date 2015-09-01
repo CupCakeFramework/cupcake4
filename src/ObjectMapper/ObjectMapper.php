@@ -95,7 +95,7 @@ class ObjectMapper
      */
     public function gerarGaleria($data, $caminho = '', $retorno_unico = false)
     {
-        $img_cat = [];
+        $img_cat = array();
         if (isset($data)) {
             $imagens = explode(';', trim($data));
             foreach ($imagens as $key => $value) {
@@ -222,7 +222,7 @@ class ObjectMapper
             throw new Exception($erro_sql[2], $erro_sql[1]);
         }
 
-        $retorno = [];
+        $retorno = array();
         if (false !== $qry) {
             if ($qry->rowCount() > 0) {
                 while ($row = $qry->fetch(PDO::FETCH_ASSOC)) {
@@ -260,9 +260,7 @@ class ObjectMapper
                                     $row['galeria_capa'] = new stdClass();
                                 }
                                 break;
-                            case 'video_url' :
-                                $row['video'] = $this->gerarVideo($row['video_url']);
-                                break;
+
                             case 'imagem' :
                             case 'imagem_destaque' :
                             case 'overlay' :
@@ -289,7 +287,7 @@ class ObjectMapper
 
 
         /* paginacao------------------------------------------------------------------------------------------ */
-        $paginacao = [];
+        $paginacao = array();
 
         if ($qtd_registros != 0) {
             $sql_qtd = 'SELECT * FROM `' . $tabela . '` tbl ' . $where_custom;
@@ -393,9 +391,7 @@ class ObjectMapper
                         $row['galeria_capa'] = new stdClass();
                     }
                     break;
-                case 'video_url' :
-                    $row['video'] = $this->gerarVideo($row['video_url']);
-                    break;
+
                 case 'imagem' :
                 case 'imagem_destaque' :
                 case 'overlay' :

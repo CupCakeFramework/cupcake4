@@ -29,10 +29,10 @@ class CupCake
     {
         $this->setServiceManager(new ServiceManager());
         $this->getServiceManager()->injectService('ConfigManager', $config);
-        foreach ($config->getValue('services') as $service => $factory) {
+        foreach ($config->get('services') as $service => $factory) {
             $this->getServiceManager()->addFactory($service, $factory);
         }
-        foreach ($config->getValue('controllers') as $controller => $factory) {
+        foreach ($config->get('controllers') as $controller => $factory) {
             $this->getServiceManager()->addFactory($controller, $factory);
         }
 
@@ -46,7 +46,9 @@ class CupCake
     function run()
     {
         $routes = new RouteCollection();
-        foreach ($this->serviceManager->get('ConfigManager')->getConfig('routes') as $rota => $values) {
+        /** @var ConfigManager $configManager */
+        $configManager = $this->serviceManager->get('ConfigManager');
+        foreach ($configManager->get('routes') as $rota => $values) {
             $routes->add($rota,
                 new Route($values['route'],
                     array('controller' => $values['controller'], 'action' => $values['action'])));

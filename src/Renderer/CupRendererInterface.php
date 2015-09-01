@@ -23,5 +23,5 @@ interface CupRendererInterface
      * @param bool|false $retornar
      * @return mixed
      */
-    public function renderizar($nomeView, array $variaveis = [], $retornar = false);
+    public function renderizar($nomeView, array $variaveis = array(), $retornar = false);
 }

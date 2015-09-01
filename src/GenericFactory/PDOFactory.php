@@ -2,7 +2,7 @@
 
 namespace Cupcake\GenericFactory;
 
-use Cupcake\Managers\ConfigManager;
+use Cupcake\Config\ConfigManager;
 use Cupcake\Service\ServiceManager;
 use PDO;
 
@@ -21,7 +21,7 @@ class PDOFactory
     {
         /* @var $configManager ConfigManager */
         $configManager = $serviceManager->get('ConfigManager');
-        $databaseConfig = $configManager->getConfig('database');
+        $databaseConfig = $configManager->get('database');
 
         return new PDO("mysql:host=" . $databaseConfig['host'] . ";dbname=" . $databaseConfig['dbname'],
             $databaseConfig['user'], $databaseConfig['password']);

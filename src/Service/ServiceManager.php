@@ -33,7 +33,7 @@ class ServiceManager implements ContainerInterface
         }
 
         if (false == class_exists($factory)) {
-            throw new ContainerException(sprintf('Factory %s must be a class or callable', $serviceId));
+            throw new ContainerException(sprintf('Factory %s must be a class or callable', $factory));
         }
 
         $instantiatedFactory = new $factory;

@@ -121,7 +121,7 @@ class CupRenderer implements CupRendererInterface
      * @return string
      * @throws Exception
      */
-    public function renderizar($nomeView, array $variaveis = [], $retornar = false)
+    public function renderizar($nomeView, array $variaveis = array(), $retornar = false)
     {
         $view = $this->pastaViews . $nomeView . '.php';
         if (!file_exists($view)) {
@@ -146,7 +146,7 @@ class CupRenderer implements CupRendererInterface
      * @return string
      * @throws Exception
      */
-    public function renderizarParcial($nomeView, array $variaveis = [], $retornar = false)
+    public function renderizarParcial($nomeView, array $variaveis = array(), $retornar = false)
     {
         $view = $this->pastaViews . $nomeView . '.php';
         if (!file_exists($view)) {
@@ -165,7 +165,7 @@ class CupRenderer implements CupRendererInterface
      * @param bool|false $retornar
      * @return string
      */
-    public function renderView($arquivoParaRenderizar, $variaveis = [], $retornar = false)
+    public function renderView($arquivoParaRenderizar, $variaveis = array(), $retornar = false)
     {
         ob_start();
         if (!empty($variaveis) && is_array($variaveis)) {
@@ -198,7 +198,7 @@ class CupRenderer implements CupRendererInterface
      */
     public function getPublicAssetsUrl()
     {
-        return $this->url(['public_assets']);
+        return $this->url(array('public_assets'));
     }
 
 

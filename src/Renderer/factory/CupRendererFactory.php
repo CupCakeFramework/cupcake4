@@ -2,7 +2,7 @@
 
 namespace Cupcake\Renderer\Factory;
 
-use Cupcake\Managers\ConfigManager;
+use Cupcake\Config\ConfigManager;
 use Cupcake\Renderer\CupRenderer;
 use Cupcake\Service\ServiceManager;
 
@@ -17,8 +17,8 @@ class CupRendererFactory
         /* @var $configManager ConfigManager */
         $configManager = $serviceManager->get('ConfigManager');
         $urlGenerator = $serviceManager->get('UrlGenerator');
-        $rendererConfig = $configManager->getConfig('renderer');
-        $siteConfig = $configManager->getConfig('site');
+        $rendererConfig = $configManager->get('renderer');
+        $siteConfig = $configManager->get('site');
 
         return new CupRenderer($rendererConfig['pastaTemplates'], $rendererConfig['pastaViews'], $siteConfig['titulo'],
             $urlGenerator);

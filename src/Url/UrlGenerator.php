@@ -36,7 +36,7 @@ class UrlGenerator
         return $url . $caminho;
     }
 
-    public function hydrateArrayToUrl(array $caminho = [], $url = '')
+    public function hydrateArrayToUrl(array $caminho = array(), $url = '')
     {
         foreach ($caminho as $value) {
             $url .= $value;

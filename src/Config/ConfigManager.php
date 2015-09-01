@@ -17,20 +17,24 @@ class ConfigManager
      * @param array $configFiles
      * @throws Exception
      */
-    public function __construct(array $configFiles)
+    public function __construct(array $configFiles = array())
     {
         $this->configFiles = $configFiles;
         foreach ($configFiles as $file) {
             if (false == file_exists($file)) {
-                throw new Exception(sprintf('O arquivo de configuracao %s nao existe ', $file));
+                throw new Exception(sprintf('The config file "%s" does not exists.', $file));
             }
             $array = require $file;
             $this->config = array_merge($array, $this->config);
         }
     }
 
+    public function setConfigFromArray(array $config)
+    {
+        $this->config = array_merge($config, $this->config);
+    }
+
     /**
-     * As configurações dadas merged
      * @return Array
      */
     public function __invoke()
@@ -46,14 +50,17 @@ class ConfigManager
     public function getNode($node)
     {
         if (false == $this->nodeExists($node)) {
-            throw new Exception(sprintf("The node %s does not exists.", $node));
+            throw new Exception(sprintf("The node %s does not exists in the config file.", $node));
         }
 
         if (false == $this->isNode($node)) {
             throw new Exception(sprintf("%s is not a node.", $node));
         }
 
-        return new ConfigManager($this->config[$node]);
+        $configManager = new ConfigManager();
+        $configManager->setConfigFromArray($this->config[$node]);
+
+        return $configManager;
     }
 
     /**
@@ -76,9 +83,9 @@ class ConfigManager
 
     /**
      * @param $key
-     * @return array
+     * @return mixed
      */
-    public function getValue($key)
+    public function get($key)
     {
         return $this->config[$key];
     }
