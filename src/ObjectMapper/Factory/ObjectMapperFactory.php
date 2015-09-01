@@ -8,7 +8,7 @@ use Cupcake\Service\ServiceManager;
 /**
  * @author Ricardo Fiorani
  */
-class DataHelperFactory
+class ObjectMapperFactory
 {
 
     /**
