@@ -1,8 +1,8 @@
 <?php
 namespace Cupcake\Mailer\Factory;
 
+use Cupcake\Config\ConfigManager;
 use Cupcake\Mailer\MailerManager;
-use Cupcake\Managers\ConfigManager;
 use Cupcake\Service\ServiceManager;
 
 /**
@@ -23,8 +23,10 @@ class MailerManagerFactory
         $configManager = $serviceManager->get('ConfigManager');
         $renderer = $serviceManager->get('CupRenderer');
 
-        return new MailerManager($configManager->getValue('mailer'), $renderer,
-            $configManager->getValue('dumpEmailOnScreen'));
+        return new MailerManager(
+            $configManager->get('mailer'), $renderer,
+            $configManager->get('dumpEmailOnScreen')
+        );
     }
 
 }
