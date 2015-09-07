@@ -22,10 +22,13 @@ class MailerManagerFactory
         /* @var $configManager ConfigManager */
         $configManager = $serviceManager->get('ConfigManager');
         $renderer = $serviceManager->get('CupRenderer');
+        $bypassEmail = $configManager->get('bypassEmailSend');
 
         return new MailerManager(
-            $configManager->get('mailer'), $renderer,
-            $configManager->get('dumpEmailOnScreen')
+            $configManager->get('mailer'),
+            $renderer,
+            $configManager->get('dumpEmailOnScreen'),
+            $bypassEmail
         );
     }
 

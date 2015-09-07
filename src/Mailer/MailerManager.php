@@ -11,6 +11,10 @@ class MailerManager
     private $to;
     private $subject;
     private $message;
+
+    /**
+     * @var bool|false
+     */
     private $dumpEmailOnScreen;
 
     /**
@@ -24,19 +28,33 @@ class MailerManager
     private $config;
 
     /**
+     * @var bool
+     */
+    private $bypassEmail;
+
+    /**
      * @param array $config
      * @param CupRendererInterface $renderer
      * @param bool|false $dumpMailOnScreen
+     * @param bool|false $bypassEmail
      */
-    public function __construct(array $config, CupRendererInterface $renderer, $dumpMailOnScreen = false)
-    {
+    public function __construct(
+        array $config,
+        CupRendererInterface $renderer,
+        $dumpMailOnScreen = false,
+        $bypassEmail = false
+    ) {
         $this->renderer = $renderer;
         $this->config = $config;
         $this->dumpEmailOnScreen = $dumpMailOnScreen;
+        $this->bypassEmail = $bypassEmail;
     }
 
     public function enviaEmail($dados, $to, $subject = 'Contato através do site', $viewEmail = 'email/contato')
     {
+        if($this->bypassEmail){
+            return true;
+        }
         $this->to = $to;
         $this->subject = $subject;
         $this->message = $this->getRenderedEmail($viewEmail, ['dados' => $dados, 'subject' => $this->subject]);
