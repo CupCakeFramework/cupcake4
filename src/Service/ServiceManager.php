@@ -16,6 +16,9 @@ class ServiceManager implements ContainerInterface
     private $services = array();
 
     /**
+     * Adds a Service Factory to be invoked when their
+     * related service be requested.
+     *
      * @param string $serviceId The Service ID
      * @param Callable $factory The Service Factory (Must be a Callable)
      * @throws ContainerException
@@ -87,6 +90,12 @@ class ServiceManager implements ContainerInterface
         return isset($this->factories[$id]);
     }
 
+
+    /**
+     * Injects an already instantiated service into the service container
+     * @param $serviceName
+     * @param $service
+     */
     public function injectService($serviceName, $service)
     {
         $this->services[$serviceName] = $service;

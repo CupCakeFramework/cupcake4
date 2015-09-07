@@ -1,6 +1,10 @@
 <?php
 
-namespace Cupcake\Core;
+/**
+ * @author Ricardo Fiorani
+ */
+
+namespace Cupcake\Application;
 
 use Cupcake\Config\ConfigManager;
 use Cupcake\Service\ServiceManager;
@@ -11,10 +15,8 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Exception;
 
-/**
- * @author Ricardo Fiorani
- */
-class CupCake
+
+class Application
 {
 
     /**
@@ -36,8 +38,7 @@ class CupCake
             $this->getServiceManager()->addFactory($controller, $factory);
         }
 
-        /* Fix do Painel */
-        $this->setDbForPainel();
+
     }
 
     /**
@@ -133,13 +134,5 @@ class CupCake
         $this->serviceManager = $serviceManager;
     }
 
-    /* Fix temporário para funcionar o painel */
-
-    public $db;
-
-    public function setDbForPainel()
-    {
-        $this->db = $this->getServiceManager()->get('PDO');
-    }
 
 }

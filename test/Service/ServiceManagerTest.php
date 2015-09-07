@@ -13,8 +13,16 @@ use Cupcake\Service\ServiceManager;
 use PHPUnit_Framework_TestCase;
 use stdClass;
 
+/**
+ * Class ServiceManagerTest
+ * @package CupCake\Test\Service
+ */
 class ServiceManagerTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @throws \Cupcake\Service\Exception\ContainerException
+     * @throws \Cupcake\Service\Exception\NotFoundException
+     */
     public function testCanRegisterService()
     {
         $service = new ServiceManager();
@@ -27,6 +35,9 @@ class ServiceManagerTest extends PHPUnit_Framework_TestCase
         $this->assertSame($stdClass, $service->get('stdClass'));
     }
 
+    /**
+     * @throws \Cupcake\Service\Exception\ContainerException
+     */
     public function testThrowsExceptionWhenServiceIdIsNotAStringWhenAddingAFactory()
     {
         $service = new ServiceManager();
@@ -35,6 +46,9 @@ class ServiceManagerTest extends PHPUnit_Framework_TestCase
         });
     }
 
+    /**
+     * @throws \Cupcake\Service\Exception\ContainerException
+     */
     public function testThrowsExceptionWhenAddingACallableFactory()
     {
         $service = new ServiceManager();
@@ -42,6 +56,10 @@ class ServiceManagerTest extends PHPUnit_Framework_TestCase
         $service->addFactory('ServiceFakeName', 'MyServiceFactoryIsHereDuh');
     }
 
+    /**
+     * @throws \Cupcake\Service\Exception\ContainerException
+     * @throws \Cupcake\Service\Exception\NotFoundException
+     */
     public function testThrowsExceptionWhenServiceIdIsNotAStringWhenGettingAService()
     {
         $service = new ServiceManager();
@@ -49,11 +67,15 @@ class ServiceManagerTest extends PHPUnit_Framework_TestCase
         $service->get(1);
     }
 
-    public function testThrowsExceptionWhenGettingAInexistentService()
+    /**
+     * @throws \Cupcake\Service\Exception\ContainerException
+     * @throws \Cupcake\Service\Exception\NotFoundException
+     */
+    public function testThrowsExceptionWhenGettingANonExistentService()
     {
         $service = new ServiceManager();
         $this->setExpectedException('Cupcake\Service\Exception\NotFoundException');
-        $service->get('NonExistantService');
+        $service->get('NonExistentService');
     }
 
 }
